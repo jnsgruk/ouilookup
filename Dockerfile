@@ -1,8 +1,11 @@
-FROM alpine:latest
+FROM python:3.7.4-slim-buster
 
-WORKDIR /usr/src/app
+COPY requirements.txt /tmp/
+RUN pip3 install --quiet -r /tmp/requirements.txt && pip3 install --quiet gunicorn
 
-COPY main.py /usr/src/app/main.py
-RUN apk add --update --no-cache python3 py3-pip && pip3 install --no-cache-dir flask gunicorn ipwhois	
+RUN useradd --create-home oui
+WORKDIR /home/oui
+USER oui
+COPY main.py ./
 
-CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--enable-stdio-inheritance", "--reload", "main:app" ]
+CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--enable-stdio-inheritance", "--worker-tmp-dir", "/dev/shm", "--log-file=-", "--reload", "main:app" ]
