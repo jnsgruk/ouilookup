@@ -10,5 +10,5 @@ $ docker run --name oui -d -p 5000:5000 jnsgruk/ouilookup:latest
 
 # Wait a few seconds for the OUI list to download...
 
-$ curl http://localhost:5000/oui/00:00:00:00:00:00
+$ curl http://localhost:5000/00:00:00:00:00:00
 ```

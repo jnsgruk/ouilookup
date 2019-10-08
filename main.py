@@ -23,7 +23,7 @@ for line in file:
 print("Added/Updated " + str(counter) + " OUI vendors")
 
 
-@app.route('/oui/<mac>')
+@app.route('/<mac>')
 def getVendor(mac):
     try:
         vendor = oui[mac.upper().replace(":", "").replace("-", "")[0:6]]
