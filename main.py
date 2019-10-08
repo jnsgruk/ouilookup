@@ -2,7 +2,6 @@
 
 from urllib.request import urlopen
 
-import ipwhois
 from flask import Flask
 
 app = Flask(__name__)
@@ -23,6 +22,7 @@ for line in file:
 
 print("Added/Updated " + str(counter) + " OUI vendors")
 
+
 @app.route('/oui/<mac>')
 def getVendor(mac):
     try:
@@ -31,14 +31,6 @@ def getVendor(mac):
         vendor = "Unknown"
     return vendor
 
-@app.route("/netname/<ip>")
-def getNetname(ip):
-    try:
-        data = ipwhois.IPWhois(ip).lookup_whois()
-        netname = data["nets"][0]["name"]
-        return netname
-    except:
-        return "Unknown"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
