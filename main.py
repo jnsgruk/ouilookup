@@ -1,26 +1,31 @@
 #!/usr/bin/env python3
 
+import atexit
+import time
 from urllib.request import urlopen
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 
 app = Flask(__name__)
 oui = {}
 
-print("Downloading sanitized OUI from https://linuxnet.ca/ieee/oui.txt...")
-file = urlopen("https://linuxnet.ca/ieee/oui.txt")
 
-counter = 0
-for line in file:
-    line = line.decode()
-    if "base 16" in line:
-        parts = line.split("\t")
-        prefix = parts[0].split()[0]
-        vendor = parts[-1].strip()
-        oui[prefix] = vendor
-        counter += 1
+def update():
+    print("Downloading sanitized OUI from https://linuxnet.ca/ieee/oui.txt...")
+    file = urlopen("https://linuxnet.ca/ieee/oui.txt")
 
-print("Added/Updated " + str(counter) + " OUI vendors")
+    counter = 0
+    for line in file:
+        line = line.decode()
+        if "base 16" in line:
+            parts = line.split("\t")
+            prefix = parts[0].split()[0]
+            vendor = parts[-1].strip()
+            oui[prefix] = vendor
+            counter += 1
+
+    print("Added/Updated " + str(counter) + " OUI vendors")
 
 
 @app.route('/<mac>')
@@ -31,6 +36,10 @@ def getVendor(mac):
         vendor = "Unknown"
     return vendor
 
+update()
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=update, trigger="interval", hours=24)
+scheduler.start()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
