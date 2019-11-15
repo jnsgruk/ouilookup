@@ -40,6 +40,7 @@ update()
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=update, trigger="interval", hours=24)
 scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
