@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import atexit
-import time
 from urllib.request import urlopen
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -12,6 +11,7 @@ oui = {}
 
 
 def update():
+    '''Downloads the latest version of the OUI list and places in memory.'''
     print("Downloading sanitized OUI from https://linuxnet.ca/ieee/oui.txt...")
     file = urlopen("https://linuxnet.ca/ieee/oui.txt")
 
@@ -30,17 +30,19 @@ def update():
 
 @app.route('/<mac>')
 def getVendor(mac):
+    '''Looks up the vendor of a specified MAC address. '''
     try:
         vendor = oui[mac.upper().replace(":", "").replace("-", "")[0:6]]
-    except:
+    except KeyError:
         vendor = "Unknown"
     return vendor
+
 
 update()
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=update, trigger="interval", hours=24)
 scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
+atexit.register(scheduler.shutdown)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
