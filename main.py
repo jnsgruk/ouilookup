@@ -11,9 +11,13 @@ oui = {}
 
 
 def update():
-    '''Downloads the latest version of the OUI list and places in memory.'''
+    """Downloads the latest version of the OUI list and places in memory."""
     print("Downloading sanitized OUI from https://linuxnet.ca/ieee/oui.txt...")
-    file = urlopen("https://linuxnet.ca/ieee/oui.txt")
+    url = "https://linuxnet.ca/ieee/oui.txt"
+    if url.lower().startswith("http"):
+        file = urlopen(url)
+    else:
+        raise ValueError from None
 
     counter = 0
     for line in file:
@@ -30,7 +34,7 @@ def update():
 
 @app.route('/<mac>')
 def getVendor(mac):
-    '''Looks up the vendor of a specified MAC address. '''
+    """Looks up the vendor of a specified MAC address."""
     try:
         vendor = oui[mac.upper().replace(":", "").replace("-", "")[0:6]]
     except KeyError:
