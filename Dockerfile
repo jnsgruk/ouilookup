@@ -3,12 +3,12 @@ FROM python:3.7.4-slim-buster as build
 # Copy the requirements file
 COPY requirements.txt /tmp/
 # Install python dependencies
-RUN pip3 install --quiet -r /tmp/requirements.txt && pip3 install --quiet gunicorn
+RUN pip3 install --quiet -r /tmp/requirements.txt && pip3 install --quiet gunicorn==20.0.4
 # Create a system user with uid 1000, no login shell and set homedir to /app
 RUN groupadd -r app && useradd -u 1000 -r -g app -m -d /app -s /sbin/nologin app && chmod 755 /app
 
 # Create the actual image from a distroless base
-FROM gcr.io/distroless/python3-debian10
+FROM gcr.io/distroless/python3-debian10@sha256:d5a717649fd93ea5b9c430d7f84e4c37ba219eb53bd73ed1d4a5a98e9edd84a7
 # Copy in the python binaries/deps
 COPY --from=build /usr/local/lib/python3.7/site-packages /usr/local/lib/python3.7/site-packages
 COPY --from=build /usr/local/bin/gunicorn /usr/local/bin/gunicorn
